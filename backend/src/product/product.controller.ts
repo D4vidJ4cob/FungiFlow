@@ -10,28 +10,33 @@ import {
     Put,
 } from '@nestjs/common';
 import {
-    CreateProductrequestDto,
+    CreateProductRequestDto,
+    ProductListResponseDto,
+    ProductResponseDto,
     UpdateProductRequestDto,
 } from './product.dto';
-import { PaginationQuery } from '../common/common.dto';
+import { ProductService } from './product.service';
 
 @Controller('products')
 export class ProductController {
+  constructor(private readonly productService: ProductService) {}
+
   @Get()
-  getAllProducts(paginationQuery: PaginationQuery): string {
-    const { page, limit } = paginationQuery;
-    return `This action returns all products. Limit ${limit}, page: ${page}`;
+  getAllProducts(): ProductListResponseDto {
+    return this.productService.getAll();
   }
 
   @Get(':id')
-  getPlaceById(@Param('id') id: string): string {
-    return `This action returns a #${id} place`;
+  getPlaceById(@Param('id') id: string): ProductResponseDto {
+    return this.productService.getById(Number(id));
   }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  createProduct(@Body() createProductDto: CreateProductrequestDto): string {
-    return `This action adds a new product for ${createProductDto.name}`;
+  createProduct(
+    @Body() createProductDto: CreateProductRequestDto,
+  ): ProductResponseDto {
+    return this.productService.create(createProductDto);
   }
 
   @Put(':id')
